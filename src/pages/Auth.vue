@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<div class="main-content">
+			<!-- Register -->
 			<form class="form-register" v-if="isRegister" @submit.prevent="submitRegister">
 				<div class="form-register-with-email">
 					<div class="form-white-background">
@@ -10,7 +11,7 @@
 
 						<!-- Username input -->
 						<p v-if="!registeredData.username.isValid" class="invalidMessage">
-							Username must not be empty and must have more than 5 character!
+							{{ registerError.username }}
 						</p>
 						<div class="form-row" :class="{ invalid: !registeredData.username.isValid }">
 							<label>
@@ -26,7 +27,7 @@
 
 						<!-- Email input -->
 						<p v-if="!registeredData.email.isValid" class="invalidMessage">
-							Email must not be empty
+							{{ registerError.email }}
 						</p>
 						<div class="form-row" :class="{ invalid: !registeredData.email.isValid }">
 							<label>
@@ -42,7 +43,7 @@
 
 						<!-- Password input -->
 						<p v-if="!registeredData.password.isValid" class="invalidMessage">
-							Password must not be empty and must have more than 5 character!
+							{{ registerError.password }}
 						</p>
 						<div class="form-row" :class="{ invalid: !registeredData.password.isValid }">
 							<label>
@@ -79,6 +80,7 @@
 				</div>
 			</form>
 
+			<!-- Login -->
 			<form v-else class="form-register" @submit.prevent="submitLogin">
 				<div class="form-register-with-email">
 					<div class="form-white-background">
@@ -92,7 +94,7 @@
 
 						<!-- Email input -->
 						<p v-if="!loginData.email.isValid" class="invalidMessage">
-							Email must not be empty!
+							{{ loginError.email }}
 						</p>
 						<div class="form-row" :class="{ invalid: !loginData.email.isValid }">
 							<label>
@@ -108,7 +110,7 @@
 
 						<!-- Password input -->
 						<p v-if="!loginData.password.isValid" class="invalidMessage">
-							Password must not be empty!
+							{{ loginError.password }}
 						</p>
 						<div class="form-row" :class="{ invalid: !loginData.password.isValid }">
 							<label>
@@ -160,6 +162,15 @@
 					email: { value: "", isValid: true },
 					password: { value: "", isValid: true },
 				},
+				registerError: {
+					username: "",
+					email: "",
+					password: "",
+				},
+				loginError: {
+					email: "",
+					password: "",
+				},
 			};
 		},
 		created() {
@@ -184,25 +195,34 @@
 				this.rInfoIsValid = true;
 				if (this.registeredData.username.value == "" || this.registeredData.username.value.length < 6) {
 					this.registeredData.username.isValid = !this.registeredData.username.isValid;
+					this.registerError.username = "Username must not be empty and must have more than 5 character!";
 					this.rInfoIsValid = !this.rInfoIsValid;
 				}
 
 				if (this.registeredData.email.value == "") {
 					this.registeredData.email.isValid = !this.registeredData.email.isValid;
+					this.registerError.email = "Email must not be empty";
 					this.rInfoIsValid = !this.rInfoIsValid;
 				}
 
 				if (this.registeredData.password.value == "" || this.registeredData.password.value.length < 6) {
 					this.registeredData.password.isValid = !this.registeredData.password.isValid;
+					this.registerError.password = "Password must not be empty and must have more than 5 character!";
 					this.rInfoIsValid = !this.rInfoIsValid;
 				}
 			},
-			submitRegister() {
+			async submitRegister() {
 				this.validateRegisterForm();
 				if (!this.rInfoIsValid) return;
-				this.$store.dispatch("user/registeringUser", this.registeredData);
-				this.isRegister = false;
-				this.redirectAndFill();
+				try {
+					await this.$store.dispatch("user/registeringUser", this.registeredData);
+					this.clearValidate("registeredData", "username");
+					this.isRegister = false;
+					this.redirectAndFill();
+				} catch (err) {
+					this.registeredData.username.isValid = false;
+					this.registerError.username = err;
+				}
 			},
 
 			// For Login
@@ -210,18 +230,27 @@
 				this.lInfoIsValid = true;
 				if (this.loginData.email.value == "") {
 					this.loginData.email.isValid = !this.loginData.email.isValid;
+					this.loginError.email = "Email must not be empty!";
 					this.lInfoIsValid = !this.lInfoIsValid;
 				}
 
 				if (this.loginData.password.value == "") {
 					this.loginData.password.isValid = !this.loginData.password.isValid;
+					this.loginError.password = "Password must not be empty!";
 					this.lInfoIsValid = !this.lInfoIsValid;
 				}
 			},
-			submitLogin() {
+			async submitLogin() {
 				this.validateLoginForm();
 				if (!this.lInfoIsValid) return;
-				console.log(this.loginData);
+				try {
+					await this.$store.dispatch("user/loginUser", this.loginData);
+					console.log("Current: ", this.$store.getters["user/showCurrentUserInfo"]);
+					this.clearValidate("loginData", "email");
+				} catch (err) {
+					this.loginData.email.isValid = false;
+					this.loginError.email = err;
+				}
 			},
 		},
 	};
