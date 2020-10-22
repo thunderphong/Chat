@@ -13,11 +13,13 @@
 		box-sizing: border-box;
 	}
 
-	html {
+	/* html {
 		font-family: "Roboto", sans-serif;
-	}
+	} */
 
 	body {
+		font: 100% / 1.414 "Open Sans", "Roboto", arial, sans-serif;
 		margin: 0;
+		background-color: #f3f3f3;
 	}
 </style>

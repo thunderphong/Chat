@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 import NotFound from "./pages/notFound.vue";
-import Test from "./pages/test.vue";
+import Auth from "./pages/Auth.vue";
 import Welcome from "./pages/Welcome.vue";
 
 const router = createRouter({
@@ -9,10 +9,8 @@ const router = createRouter({
 	routes: [
 		{ path: "/", redirect: "/welcome" },
 		{ path: "/welcome", component: Welcome },
-		{ path: "/auth", component: Test },
-
+		{ path: "/auth", name: "auth", component: Auth, props: true },
 		{ path: "/dashboard", component: null },
-
 		{ path: "/:notFound(.*)*", component: NotFound },
 	],
 });

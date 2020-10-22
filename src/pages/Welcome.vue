@@ -1,4 +1,13 @@
 <template>
+	<the-header></the-header>
 	<h2>WELCOME TO DASHBOARD</h2>
-	<button class="btn btn-primary">xXXss</button>
 </template>
+
+<script>
+	import TheHeader from "../components/layout/TheHeader.vue";
+	export default {
+		components: {
+			"the-header": TheHeader,
+		},
+	};
+</script>
