@@ -245,8 +245,8 @@
 				if (!this.lInfoIsValid) return;
 				try {
 					await this.$store.dispatch("user/loginUser", this.loginData);
-					console.log("Current: ", this.$store.getters["user/showCurrentUserInfo"]);
 					this.clearValidate("loginData", "email");
+					this.$router.replace("/dashboard");
 				} catch (err) {
 					this.loginData.email.isValid = false;
 					this.loginError.email = err;

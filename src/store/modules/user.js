@@ -16,6 +16,9 @@ export default {
 		changeCurrentUserInfo(state, data) {
 			state.currentUserInfo = data;
 		},
+		logoutUser(state) {
+			state.currentUserInfo = {};
+		},
 	},
 	actions: {
 		async registeringUser(context, data) {
@@ -53,12 +56,29 @@ export default {
 
 			if (!response.ok) throw new Error(responseData.error);
 			else {
-				console.log(responseData);
+				localStorage.setItem("token", responseData.token);
 				context.commit("changeCurrentUserInfo", {
 					token: responseData.token,
 					username: responseData.user.username,
 				});
 			}
+		},
+
+		async logoutUser(context) {
+			localStorage.removeItem("token");
+			context.commit("logoutUser");
+
+			// const response = await fetch("http://localhost:3000/logout", {
+			// 	method: "POST",
+			// 	headers: { "Content-Type": "application/json" },
+			// });
+
+			// const responseData = await response.json();
+
+			// if (!response.ok) throw new Error(responseData.error);
+			// else {
+			// 	console.log(responseData);
+			// }
 		},
 	},
 	getters: {
@@ -67,6 +87,9 @@ export default {
 		},
 		showCurrentUserInfo: (state) => {
 			return state.currentUserInfo;
+		},
+		isAuthenticated: () => {
+			return !!localStorage.getItem("token");
 		},
 	},
 };
