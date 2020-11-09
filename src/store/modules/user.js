@@ -57,6 +57,7 @@ export default {
 			if (!response.ok) throw new Error(responseData.error);
 			else {
 				localStorage.setItem("token", responseData.token);
+				localStorage.setItem("username", responseData.user.username);
 				context.commit("changeCurrentUserInfo", {
 					token: responseData.token,
 					username: responseData.user.username,
@@ -65,20 +66,31 @@ export default {
 		},
 
 		async logoutUser(context) {
+			const token = localStorage.getItem("token");
+			const username = localStorage.getItem("username");
 			localStorage.removeItem("token");
+			localStorage.removeItem("username");
+
 			context.commit("logoutUser");
 
-			// const response = await fetch("http://localhost:3000/logout", {
-			// 	method: "POST",
-			// 	headers: { "Content-Type": "application/json" },
-			// });
+			try {
+				const data = {
+					token: token,
+					username: username,
+				};
+				const response = await fetch("http://localhost:3000/logout", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(data),
+				});
 
-			// const responseData = await response.json();
+				const responseData = await response.text();
 
-			// if (!response.ok) throw new Error(responseData.error);
-			// else {
-			// 	console.log(responseData);
-			// }
+				if (!response.ok) throw new Error(responseData.error);
+				else console.log(responseData);
+			} catch (err) {
+				console.log(err);
+			}
 		},
 	},
 	getters: {
